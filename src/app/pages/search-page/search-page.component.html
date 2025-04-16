@@ -1,0 +1,301 @@
+<ion-header >
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-button fill="clear" color="light">
+        <ion-icon name="chevron-back-outline" slot="start"></ion-icon>
+        <!-- Annuler -->
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Relations</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+
+<ion-content>
+  <ion-card (click) = "routeSearch()" >
+    <ion-card-content>
+
+      <ion-grid class="no-padding-grid">
+        <ion-row class="align-center">
+          <ion-col size = "1"> 
+            <ion-icon name="locate-outline" color="primary"></ion-icon>
+          </ion-col>
+          <ion-col size = "11">
+            <ion-item class = "no-padding-item" >
+              <ion-input [(ngModel)]= "from" placeholder="Départ" (ionInput)="onInput(true)"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+
+      <ion-grid class="no-padding-grid">
+        <ion-row class="align-center">
+          <ion-col size = "1"> 
+            <ion-icon name="locate-outline" color="primary"></ion-icon>
+          </ion-col>
+          <ion-col size = "11">
+            <ion-item class = "no-padding-item" >
+              <ion-input [(ngModel)]="to" placeholder="Arrivée" (ionInput)="onInput( false)"></ion-input>
+            </ion-item>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      
+      @for(result of completionResponseFrom; track result.label) {
+            <ion-list>
+             <ion-item (click)="selectStation(result.label, true)">
+                <ion-label >{{result.label}}</ion-label>
+              </ion-item>
+            </ion-list>
+        }
+
+      @for(result of completionResponseTo; track result.label) {
+        <ion-list>
+          <ion-item (click)="selectStation(result.label, false)">
+            <ion-label >{{result.label}}</ion-label>
+          </ion-item>
+        </ion-list>
+      }
+
+  
+      <ion-grid (click)="toggleModal()" class="no-padding-grid">
+        <ion-item lines=" none" class = "no-padding-item">
+          <ion-row class="align-center">
+            <ion-col size= "auto">
+              <ion-label>{{date}}</ion-label>
+            </ion-col>
+            <ion-col size = "auto">
+              |
+            </ion-col>
+            <ion-col size = "auto">
+             <ion-label>{{heure}}</ion-label>
+            </ion-col>
+            <ion-col size = "auto">
+              |
+            </ion-col>
+            <ion-col size = "auto">
+              <ion-icon name="refresh-outline"></ion-icon>
+            </ion-col>
+          </ion-row>
+        </ion-item>
+      </ion-grid>
+
+      
+      @if (showDateModal) {
+      <ion-modal  [isOpen]="showDateModal" (didDismiss)="toggleModal()" trigger="open-modal" [initialBreakpoint]="0.50" [breakpoints]="[0, 0.25, 0.5, 0.75]">
+        <ng-template>
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-title class = "titleModal" >Date du voyage</ion-title>
+              <ion-icon slot = "end" name="close-circle-outline" size="large"  (click)="toggleModal()"></ion-icon>
+            </ion-toolbar>
+          </ion-header>
+      
+          <ion-content>
+            <ion-card> 
+            <ion-segment [(ngModel)]="mode" value="depart">
+              <ion-segment-button value="depart">Départ</ion-segment-button>
+              <ion-segment-button value="arrivee">Arrivée</ion-segment-button>
+            </ion-segment>
+            </ion-card>
+            <ion-card> 
+
+              <ion-datetime
+              
+              name="selectedDate"
+              presentation="date-time"
+              prefer-wheel="true"
+              [(ngModel)]="selectedDate"
+              [min]="minDate"
+              [max]="maxDate"
+              locale="fr-FR"
+              ></ion-datetime>
+            </ion-card>
+              
+            <ion-footer>
+              <ion-button fill="solid" class ="btnModal" color = "danger" expand="block" (click)="validerDate()">Valider</ion-button>
+            </ion-footer>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
+      }
+    
+ 
+   
+    </ion-card-content>
+  </ion-card>
+
+
+   <!-- Résultats horaires -->
+   @if(routeConnections) {
+    <ion-card> 
+     <ion-label>{{date}}</ion-label>
+    </ion-card>
+    
+    @for (result of routeConnections; track result) {
+      <ion-card>
+        <ion-card-content>
+          
+            <ion-grid>
+              <ion-row> 
+                <ion-col size = "1">  
+                  @if (result.legs[0].type_name !== "Trajet à pied") { 
+                    @if (result.legs[0].type_name === "Train"){
+                      <ion-img src="/train.svg" alt="Train icon"> </ion-img>  
+                    }
+                    @if (result.legs[0].type_name === "Tram"){
+                      <ion-img src="/tram.svg" alt="Train icon"> </ion-img>  
+                   }
+                    @if (result.legs[0].type_name ===  "Autobus"){
+                      <ion-img src="/bus.svg" alt="Train icon"> </ion-img>  
+                    }
+                  }
+
+                  @if (result.legs[0].type_name === "Trajet à pied") { 
+                    @if (result.legs[1].type_name === "Train"){
+                      <ion-img src="/train.svg" alt="Train icon"> </ion-img>  
+                    }
+                    @if (result.legs[1].type_name === "Tram"){
+                      <ion-img src="/tram.svg" alt="Train icon"> </ion-img>  
+                    }
+                    @if (result.legs[1].type_name ===  "Autobus"){
+                      <ion-img src="/bus.svg" alt="Train icon"> </ion-img>  
+                    }
+                  }
+                </ion-col>
+
+                <ion-col size = "2">
+                  @if (result.legs[0].type_name !== "Trajet à pied") { 
+                    @if ( result.legs[0].type_name === "Train"){ 
+
+                       
+                      <ion-img src="/trains/{{ getLegCode(result.legs[0]) }}.svg" alt="Train icon"></ion-img>
+  
+                    }
+                    @if ( result.legs[0].type_name !== "Train"){ 
+                      <h3>
+                        {{ getLegCode(result.legs[0]) }}
+                      </h3>
+                    }
+
+                  
+                  }
+                  @if (result.legs[0].type_name === "Trajet à pied") { 
+                    @if ( result.legs[1].type_name === "Train"){ 
+
+                       
+                      <ion-img src="/trains/{{ getLegCode(result.legs[1]) }}.svg" alt="Train icon"></ion-img>
+  
+                    }
+                    @if ( result.legs[1].type_name !== "Train"){ 
+                      <h3>
+                        {{ getLegCode(result.legs[1]) }}
+                      </h3>
+                    }
+                  }
+                </ion-col>
+                <ion-col size = "6">
+                  @if (result.legs[0].type_name !== "Trajet à pied") { 
+                    <ion-label>Direction {{ result.legs[0].terminal }}</ion-label>
+                  }
+                  @if (result.legs[0].type_name === "Trajet à pied") { 
+                    <ion-label>Direction {{ result.legs[1].terminal }}</ion-label>
+                  }
+                  
+                </ion-col>
+
+              </ion-row>
+
+            </ion-grid>
+        
+    
+          <!-- Ligne horizontale avec étapes -->
+          <ion-grid class="timeline-grid">
+            <ion-row class="ion-align-items-center">
+              
+              @if (result.legs[0].type_name === "Trajet à pied"){ 
+              <ion-col size="2" class="timeline-icon">
+                  <div> 
+                   <ion-icon name="walk-outline"></ion-icon>
+                  </div> 
+                  <div> 
+                   <p>{{ getDurationInMinutes(result.legs[0].departure, result.legs[0]?.exit?.arrival) }} '</p>
+                  </div>
+                </ion-col>
+                <ion-col size="2"> 
+                  <p> {{ result.legs[1].departure  | date:'HH:mm' }}</p>
+                </ion-col>
+              }
+              @if (result.legs[0].type_name !== "Trajet à pied"){ 
+                <ion-col size="2"> 
+                  <p> {{ result.departure  | date:'HH:mm' }}</p>
+                </ion-col>
+              }
+            
+
+              <ion-col size="6">
+                <div class="timeline-line">
+                  <span class="timeline-dot"></span>
+                  <span class="timeline-segment"></span>
+                  <span class="timeline-dot"></span>
+                </div>
+              </ion-col>
+              <ion-col size="2"> 
+                <p> {{ result.arrival  | date:'HH:mm' }}</p>
+              </ion-col >
+            </ion-row>
+          </ion-grid>
+          <ion-grid>
+            <ion-row class="ion-align-items-bottom"> 
+              <ion-col size = "3">
+                @if (result.legs[0].type_name === "Trajet à pied"){ 
+                  @if (result.legs[1].type_name === "Train") { 
+                    <div>Voie {{result.legs[1].track}}</div>
+                  }
+                  @if (result.legs[1].type_name !== "Train") {
+                    <div>Quai {{result.legs[1].track}}</div>
+                  }
+                }
+                @if (result.legs[0].type_name !== "Trajet à pied"){ 
+                  @if (result.legs[0].type_name === "Train") { 
+                    <div>Voie {{result.legs[0].track}}</div>
+                  }
+                  @if (result.legs[0].type_name !== "Train") {
+                    <div>Quai {{result.legs[0].track}}</div>
+                  }
+                }
+              </ion-col>
+              <ion-col size =  "2">
+                <div class="people-icon-group">
+                  <div><span>1.</span><img src="/class/people.svg" width="20" /></div>
+                  <div><span>2.</span><img src="/class/people.svg" width="20" /></div>
+                </div>  
+              </ion-col>
+              @if (result.legs[0].type_name === "Trajet à pied") {
+                @if (hasAttributeInAnyLeg(result.legs, '0_6.6_VR')){
+                  <ion-img src="/disturb/veloR.svg" alt="Velo icon"> </ion-img>
+                }
+              }   
+              @if (result.legs[0].type_name !== "Trajet à pied"){ 
+                @if (hasAttributeInAnyLeg(result.legs, '0_6.6_VR')){
+                  <ion-img src="/disturb/veloR.svg" alt="Velo icon"> </ion-img>
+                }
+              }
+              <ion-col>
+                <div> {{ getDurationFormatted(result.departure, result.arrival) }}</div>
+              </ion-col>
+        
+              @if (result.disruptions){ 
+                <ion-col>
+                  <div>logo dist</div>
+                </ion-col>
+              }
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    }
+       
+    
+    }
+    </ion-content>
