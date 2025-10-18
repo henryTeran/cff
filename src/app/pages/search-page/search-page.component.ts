@@ -4,34 +4,35 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonModal, IonRow, IonSegmentButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
+import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonModal, IonRow, IonSegment, IonSegmentButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { ApiService } from '../../services/api/api.service';
 import { CompletionResponse } from '../../interfaces/completionResponse';
 import { Connection, Leg, RouteResponse } from '../../interfaces/routeResponse';
 import { DividePipe } from '../../pipes/divide.pipe';
 
 const UIElement = [
-  IonContent, 
+  IonContent,
   IonGrid,
   IonRow,
   IonCol,
   IonInput,
   IonButton,
-  IonDatetime, 
-  IonHeader, 
+  IonDatetime,
+  IonHeader,
   IonTitle,
   IonToolbar,
   IonButtons,
   IonIcon,
-  IonCard, 
-  IonLabel, 
+  IonCard,
+  IonLabel,
   IonItem,
   IonDatetimeButton,
   IonCardContent,
   IonList,
   IonChip,
-  IonModal, 
-  IonSegmentButton, 
+  IonModal,
+  IonSegment,
+  IonSegmentButton,
   IonFooter,
   IonImg
 ];
@@ -158,8 +159,8 @@ export class SearchPageComponent implements OnInit, OnDestroy {
   }
 
   toggleModal() {
-    this.showDateModal =! this.showDateModal;
-    }
+    this.showDateModal = !this.showDateModal;
+  }
 
   validerDate() {
     if (!this.selectedDate) {
@@ -192,8 +193,17 @@ export class SearchPageComponent implements OnInit, OnDestroy {
   
   async routeSearch() {
     if (!this.from || !this.to) {
+      console.warn('From or To is missing:', { from: this.from, to: this.to });
       return;
     }
+
+    console.log('Starting route search...', {
+      from: this.from,
+      to: this.to,
+      date: this.dateConvert,
+      time: this.heure,
+      mode: this.mode
+    });
 
     try {
       const searchParams = {
@@ -207,19 +217,25 @@ export class SearchPageComponent implements OnInit, OnDestroy {
 
       this.saveToSession(searchParams);
 
+      console.log('Calling API with params:', searchParams);
       const result = await this._apiService.route(searchParams);
+      console.log('API result received:', result);
+
       this.routesSearch = result;
       this.routeConnections = result.connections;
       this.routeLegs = this.routeConnections?.flatMap(connection => connection.legs || []);
 
-      this.router.navigate(['/result'], {
+      console.log('Navigating to /result...');
+      await this.router.navigate(['/result'], {
         state: {
           searchResult: result,
           searchParams
         }
       });
+      console.log('Navigation complete');
     } catch (error) {
       console.error('Route search error:', error);
+      alert('Erreur lors de la recherche. Veuillez réessayer.');
     }
   }
 
