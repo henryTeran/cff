@@ -58,7 +58,13 @@ export class NotificationsService {
 
       notification.onclick = () => {
         window.focus();
-        this.router.navigate(['/result']);
+
+        if (data?.url) {
+          this.router.navigateByUrl(data.url);
+        } else {
+          this.router.navigate(['/result']);
+        }
+
         notification.close();
       };
     } catch (error) {

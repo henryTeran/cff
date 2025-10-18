@@ -1,0 +1,91 @@
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" aria-label="Retour">
+        <ion-icon name="chevron-back-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Paramètres</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-card>
+    <ion-card-content>
+      <h3>Préférences d'alertes</h3>
+      <ion-list>
+        <ion-item>
+          <ion-label>Seuil de retard (min)</ion-label>
+          <ion-range
+            [(ngModel)]="alertPrefs.minDelayMin"
+            (ionChange)="updateAlertPrefs()"
+            min="1"
+            max="30"
+            step="1"
+            snaps="true"
+            pin="true"
+            aria-label="Seuil de retard en minutes"
+          ></ion-range>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Alertes ascenseurs & accès</ion-label>
+          <ion-toggle
+            [(ngModel)]="alertPrefs.lifts"
+            (ionChange)="updateAlertPrefs()"
+            aria-label="Activer les alertes ascenseurs"
+          ></ion-toggle>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-content>
+      <h3>Affichage</h3>
+      <ion-list>
+        <ion-item>
+          <ion-label>Taille de police</ion-label>
+          <ion-button (click)="decreaseFontSize()" fill="outline" aria-label="Diminuer la taille de police">
+            A−
+          </ion-button>
+          <span style="margin: 0 8px;">{{ uiPrefs.fontScale.toFixed(1) }}</span>
+          <ion-button (click)="increaseFontSize()" fill="outline" aria-label="Augmenter la taille de police">
+            A+
+          </ion-button>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Contraste fort</ion-label>
+          <ion-toggle
+            [(ngModel)]="uiPrefs.highContrast"
+            (ionChange)="updateUiPrefs()"
+            aria-label="Activer le contraste élevé"
+          ></ion-toggle>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Thème</ion-label>
+          <ion-select
+            [(ngModel)]="uiPrefs.theme"
+            (ionChange)="updateUiPrefs()"
+            interface="popover"
+            aria-label="Sélectionner le thème"
+          >
+            <ion-select-option value="system">Système</ion-select-option>
+            <ion-select-option value="light">Clair</ion-select-option>
+            <ion-select-option value="dark">Sombre</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card>
+    <ion-card-content>
+      <ion-button expand="block" color="medium" (click)="resetSettings()">
+        Réinitialiser les paramètres
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

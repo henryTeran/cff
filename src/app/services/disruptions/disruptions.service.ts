@@ -8,6 +8,7 @@ export interface DisruptionAlert {
   connection: Connection;
   message: string;
   alternatives: Connection[];
+  alternativeIndex?: number;
 }
 
 @Injectable({
@@ -107,18 +108,25 @@ export class DisruptionsService {
     });
 
     const bestAlternative = this.findBestAlternative(alternatives);
+    const alternativeIndex = bestAlternative ? fullResponse.connections.indexOf(bestAlternative) : -1;
 
     const alert: DisruptionAlert = {
       connection: disruptedConnections[0],
       message: this.getDisruptionMessage(disruptedConnections[0]),
-      alternatives: bestAlternative ? [bestAlternative] : alternatives.slice(0, 2)
+      alternatives: bestAlternative ? [bestAlternative] : alternatives.slice(0, 2),
+      alternativeIndex: alternativeIndex >= 0 ? alternativeIndex : undefined
     };
 
     this.disruptionAlertSubject.next(alert);
 
+    const notificationData = alternativeIndex >= 0
+      ? { url: `/details/${alternativeIndex}` }
+      : { url: '/result' };
+
     await this.notificationsService.showNotification(
       'Perturbation détectée',
-      alert.message
+      alert.message,
+      notificationData
     );
   }
 

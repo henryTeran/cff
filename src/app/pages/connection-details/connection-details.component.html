@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()" aria-label="Retour">
+        <ion-icon name="chevron-back-outline" slot="start"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Détails de la connexion</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (connection) {
+    <ion-card>
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="6">
+              <strong>Départ</strong>
+              <div>{{ connection.from }}</div>
+              <div>{{ getTime(connection.departure) }}</div>
+            </ion-col>
+            <ion-col size="6">
+              <strong>Arrivée</strong>
+              <div>{{ connection.to }}</div>
+              <div>{{ getTime(connection.arrival) }}</div>
+            </ion-col>
+          </ion-row>
+          <ion-row>
+            <ion-col>
+              <strong>Durée totale:</strong> {{ getDuration(connection.departure, connection.arrival) }}
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card>
+      <ion-card-content>
+        <h3>Itinéraire détaillé</h3>
+        <ion-list>
+          @for (leg of connection.legs; track leg; let i = $index) {
+            <ion-item>
+              <ion-grid class="ion-no-padding" style="width: 100%;">
+                <ion-row class="ion-align-items-center">
+                  <ion-col size="2">
+                    <app-sbb-mode-icon [leg]="leg" [size]="32"></app-sbb-mode-icon>
+                  </ion-col>
+
+                  <ion-col size="10">
+                    @if (leg.type_name !== 'Trajet à pied') {
+                      <div><strong>{{ getLegCode(leg) }}</strong> - {{ leg.terminal }}</div>
+                      <div>{{ leg.name }} → {{ leg.exit?.name }}</div>
+                      <div>{{ getTime(leg.departure || '') }} - {{ getTime(leg.exit?.arrival || '') }}</div>
+                      @if (leg.track) {
+                        <div>Voie {{ leg.track }}</div>
+                      }
+                      @if (leg.occupancy) {
+                        <div>Occupation: {{ getOccupancyLabel(leg.occupancy) }}</div>
+                      }
+                    } @else {
+                      <div>Trajet à pied</div>
+                      <div>{{ leg.name }} → {{ leg.exit?.name }}</div>
+                      @if (leg.runningtime) {
+                        <div>{{ leg.runningtime }} minutes</div>
+                      }
+                    }
+                  </ion-col>
+                </ion-row>
+              </ion-grid>
+            </ion-item>
+          }
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+  } @else {
+    <ion-card>
+      <ion-card-content>
+        <p>Aucun détail disponible</p>
+        <ion-button (click)="goBack()">Retour aux résultats</ion-button>
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>
