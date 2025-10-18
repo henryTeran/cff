@@ -1,6 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonModal, IonRow, IonSegmentButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
 import { ApiService } from '../../services/api/api.service';
 import { CompletionResponse } from '../../interfaces/completionResponse';
@@ -39,12 +42,16 @@ const UIElement = [
   styleUrls: ['./search-page.component.scss'],
   imports: [CommonModule, ...UIElement, FormsModule, DividePipe]
 })
-export class SearchPageComponent  implements OnInit {
-  public completionResponseFrom: CompletionResponse = []; 
-  public completionResponseTo: CompletionResponse = []; 
-  public from: string = ""; 
+export class SearchPageComponent implements OnInit, OnDestroy {
+  public completionResponseFrom: CompletionResponse = [];
+  public completionResponseTo: CompletionResponse = [];
+  public from: string = "";
   public to: string = ""
-  public mode: 'depart' | 'arrivee' = 'depart';
+  public mode: 'depart' | 'arrival' = 'depart';
+
+  private fromSearchSubject = new Subject<string>();
+  private toSearchSubject = new Subject<string>();
+  private abortController?: AbortController;
   public selectedDate: string = new Date().toISOString();;
   public showDateModal = false;
   public date: string = ""; 
@@ -58,37 +65,96 @@ export class SearchPageComponent  implements OnInit {
   minDate: string = new Date().toISOString();
   maxDate: string = new Date(new Date().setDate(new Date().getDate() + 30)).toISOString();
 
-  constructor(private readonly _apiService: ApiService) { 
+  constructor(
+    private readonly _apiService: ApiService,
+    private router: Router
+  ) {
+    this.setupDebounce();
   }
 
   ngOnInit() {
     this.validerDate();
-   }
+    this.loadFromSession();
+  }
+
+  ngOnDestroy() {
+    this.fromSearchSubject.complete();
+    this.toSearchSubject.complete();
+    if (this.abortController) {
+      this.abortController.abort();
+    }
+  }
+
+  private setupDebounce() {
+    this.fromSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(async (term) => {
+      if (term.length >= 2) {
+        await this.performCompletion(term, true);
+      } else {
+        this.completionResponseFrom = [];
+      }
+    });
+
+    this.toSearchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged()
+    ).subscribe(async (term) => {
+      if (term.length >= 2) {
+        await this.performCompletion(term, false);
+      } else {
+        this.completionResponseTo = [];
+      }
+    });
+  }
    
  
 
-  async onInput( destination: boolean) {
-   if (destination ) {
-      const saisie = this.from;
-      this.completionResponseFrom = await this._apiService.completion(saisie); 
-      console.log(this.completionResponseFrom);
+  onInput(destination: boolean) {
+    if (destination) {
+      this.fromSearchSubject.next(this.from);
     } else {
-      const saisie = this.to;
-      this.completionResponseTo = await this._apiService.completion(saisie); 
-      console.log(this.completionResponseTo);
+      this.toSearchSubject.next(this.to);
+    }
+  }
+
+  private async performCompletion(term: string, isFrom: boolean) {
+    try {
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+      this.abortController = new AbortController();
+
+      const result = await this._apiService.completion(term, this.abortController.signal);
+
+      if (isFrom) {
+        this.completionResponseFrom = result;
+      } else {
+        this.completionResponseTo = result;
+      }
+    } catch (error: any) {
+      if (error.name !== 'AbortError') {
+        console.error('Completion error:', error);
+      }
     }
   }
 
 
-  selectStation(Gare: string, destination :boolean) {
+  selectStation(Gare: string, destination: boolean) {
     if (destination) {
-      this.from = Gare; 
+      this.from = Gare;
       this.completionResponseFrom = [];
-    }else{
-      this.to = Gare; 
+    } else {
+      this.to = Gare;
       this.completionResponseTo = [];
     }
+  }
 
+  swapStations() {
+    const temp = this.from;
+    this.from = this.to;
+    this.to = temp;
   }
 
   toggleModal() {
@@ -124,21 +190,55 @@ export class SearchPageComponent  implements OnInit {
     this.showDateModal = false;
   }
   
-  async routeSearch (){
-    console.log(this.from, this.to, this.dateConvert,  this.heure);
-    if(this.from ||this.to) {
-
-      const result = await this._apiService.route({from: this.from, to: this.to, date: this.dateConvert, time: this.heure}); 
-      this.routesSearch = result; 
-      this.routeConnections = result.connections; 
-      this.routeLegs = this.routeConnections?.flatMap(connection => connection.legs || []);
-      //this.terminal = routeLegs[0].terminal; 
-      console.log(result);
-      console.log("routeConnections", this.routeConnections );
-      console.log("routeLegs", this.routeLegs);
+  async routeSearch() {
+    if (!this.from || !this.to) {
+      return;
     }
 
+    try {
+      const searchParams = {
+        from: this.from,
+        to: this.to,
+        date: this.dateConvert,
+        time: this.heure,
+        timeType: this.mode,
+        num: 5
+      };
 
+      this.saveToSession(searchParams);
+
+      const result = await this._apiService.route(searchParams);
+      this.routesSearch = result;
+      this.routeConnections = result.connections;
+      this.routeLegs = this.routeConnections?.flatMap(connection => connection.legs || []);
+
+      this.router.navigate(['/result'], {
+        state: {
+          searchResult: result,
+          searchParams
+        }
+      });
+    } catch (error) {
+      console.error('Route search error:', error);
+    }
+  }
+
+  private saveToSession(params: any) {
+    sessionStorage.setItem('lastSearch', JSON.stringify(params));
+  }
+
+  private loadFromSession() {
+    const stored = sessionStorage.getItem('lastSearch');
+    if (stored) {
+      try {
+        const params = JSON.parse(stored);
+        this.from = params.from || '';
+        this.to = params.to || '';
+        this.mode = params.timeType || 'depart';
+      } catch (error) {
+        console.error('Error loading session:', error);
+      }
+    }
   } 
   convertDate (dateNonConvert:string) : string {
     const date = new Date(dateNonConvert);

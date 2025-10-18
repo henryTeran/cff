@@ -1,3 +1,159 @@
-<p>
-  result-page works!
-</p>
+<ion-header>
+  <ion-toolbar color="danger">
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">
+        <ion-icon name="chevron-back-outline" slot="start"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Résultats</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="toggleMonitoring()">
+        <ion-icon [name]="isMonitoring ? 'notifications' : 'notifications-outline'"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  @if (disruptionAlert) {
+    <ion-card color="warning">
+      <ion-card-content>
+        <ion-grid>
+          <ion-row>
+            <ion-col size="11">
+              <h3>Perturbation détectée</h3>
+              <p>{{ disruptionAlert.message }}</p>
+              @if (disruptionAlert.alternatives.length > 0) {
+                <p><strong>Alternatives disponibles:</strong></p>
+                @for (alt of disruptionAlert.alternatives; track alt) {
+                  <div>
+                    <ion-chip color="success">
+                      <ion-label>
+                        {{ getTime(alt.departure) }} - {{ getTime(alt.arrival) }}
+                        ({{ getDuration(alt) }})
+                      </ion-label>
+                    </ion-chip>
+                  </div>
+                }
+              }
+            </ion-col>
+            <ion-col size="1">
+              <ion-button fill="clear" (click)="dismissAlert()">
+                <ion-icon name="close"></ion-icon>
+              </ion-button>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
+      </ion-card-content>
+    </ion-card>
+  }
+
+  @if (searchResult) {
+    <ion-card>
+      <ion-card-content>
+        <ion-label>
+          {{ searchResult.connections[0]?.from }} → {{ searchResult.connections[0]?.to }}
+        </ion-label>
+      </ion-card-content>
+    </ion-card>
+
+    @for (connection of connections; track connection) {
+      <ion-card [class.disrupted]="hasDisruptions(connection)">
+        <ion-card-content>
+          <ion-grid>
+            <ion-row class="ion-align-items-center">
+              <ion-col size="2">
+                @if (connection.legs[0]?.type_name !== 'Trajet à pied') {
+                  <app-sbb-mode-icon [leg]="connection.legs[0]" [size]="36"></app-sbb-mode-icon>
+                } @else if (connection.legs.length > 1) {
+                  <app-sbb-mode-icon [leg]="connection.legs[1]" [size]="36"></app-sbb-mode-icon>
+                }
+              </ion-col>
+
+              <ion-col size="2">
+                @if (connection.legs[0]?.type_name !== 'Trajet à pied') {
+                  <strong>{{ getLegCode(connection.legs[0]) }}</strong>
+                } @else if (connection.legs.length > 1) {
+                  <strong>{{ getLegCode(connection.legs[1]) }}</strong>
+                }
+              </ion-col>
+
+              <ion-col size="8">
+                @if (connection.legs[0]?.type_name !== 'Trajet à pied') {
+                  <ion-label>Direction {{ connection.legs[0]?.terminal }}</ion-label>
+                } @else if (connection.legs.length > 1) {
+                  <ion-label>Direction {{ connection.legs[1]?.terminal }}</ion-label>
+                }
+              </ion-col>
+            </ion-row>
+
+            <ion-row class="ion-align-items-center">
+              @if (connection.legs[0]?.type_name === 'Trajet à pied' && connection.legs.length > 1) {
+                <ion-col size="2" class="text-center">
+                  <ion-icon name="walk-outline"></ion-icon>
+                </ion-col>
+                <ion-col size="2">
+                  <strong>{{ getTime(connection.legs[1].departure || '') }}</strong>
+                </ion-col>
+              } @else {
+                <ion-col size="2">
+                  <strong>{{ getTime(connection.departure) }}</strong>
+                </ion-col>
+              }
+
+              <ion-col size="6">
+                <div class="timeline-line">
+                  <span class="timeline-dot"></span>
+                  <span class="timeline-segment"></span>
+                  <span class="timeline-dot"></span>
+                </div>
+              </ion-col>
+
+              <ion-col size="2">
+                <strong>{{ getTime(connection.arrival) }}</strong>
+              </ion-col>
+            </ion-row>
+
+            <ion-row>
+              <ion-col size="4">
+                @if (connection.legs[0]?.type_name === 'Trajet à pied' && connection.legs.length > 1) {
+                  @if (connection.legs[1]?.type_name === 'Train') {
+                    <div>Voie {{ connection.legs[1]?.track }}</div>
+                  } @else {
+                    <div>Quai {{ connection.legs[1]?.track }}</div>
+                  }
+                } @else {
+                  @if (connection.legs[0]?.type_name === 'Train') {
+                    <div>Voie {{ connection.legs[0]?.track }}</div>
+                  } @else {
+                    <div>Quai {{ connection.legs[0]?.track }}</div>
+                  }
+                }
+              </ion-col>
+
+              <ion-col size="4">
+                <ion-chip>
+                  <ion-label>{{ getDuration(connection) }}</ion-label>
+                </ion-chip>
+              </ion-col>
+
+              <ion-col size="4">
+                @if (hasDisruptions(connection)) {
+                  <ion-badge color="danger">
+                    <ion-icon name="warning-outline"></ion-icon>
+                  </ion-badge>
+                }
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    }
+  } @else {
+    <ion-card>
+      <ion-card-content>
+        <p>Aucun résultat disponible</p>
+      </ion-card-content>
+    </ion-card>
+  }
+</ion-content>

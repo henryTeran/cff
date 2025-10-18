@@ -1,0 +1,24 @@
+{
+  "name": "CFF App",
+  "short_name": "CFF",
+  "description": "Application de recherche et suivi des horaires CFF",
+  "theme_color": "#ec0000",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "scope": "/",
+  "start_url": "/",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/logocff.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
