@@ -288,6 +288,15 @@ export class SearchPageComponent implements OnInit, OnDestroy {
       });
     }
 
+  navigateToSettings() {
+    this.router.navigate(['/settings']);
+  }
 
-
+  navigateToOnboard() {
+    if (this.routeConnections && this.routeConnections.length > 0) {
+      this.router.navigate(['/onboard'], {
+        state: { connection: this.routeConnections[0] }
+      });
+    }
+  }
 }

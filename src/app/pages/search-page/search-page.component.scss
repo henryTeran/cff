@@ -1,78 +1,201 @@
-
-ion-title {
-  --color: white;
+.hero-section {
+  text-align: center;
+  padding: 2rem 1rem;
+  margin-bottom: 1rem;
 }
 
-.no-padding-item {
-  --padding-start: 0;
-  --inner-padding-end: 0;
-  --inner-padding-start: 0;
-  --padding-end: 0;
-  padding: 0;
+.hero-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--ion-color-primary);
+  margin: 0 0 0.5rem 0;
+}
+
+.hero-subtitle {
+  font-size: 1rem;
+  color: var(--ion-color-medium);
   margin: 0;
 }
 
-.no-padding-grid {
-  padding: 0;
-  margin: 0;
+.search-card {
+  margin: 0 0 1rem 0;
+  background: var(--ion-card-background);
 }
 
-.no-padding-grid ion-row {
-  padding: 0;
-  margin: 0;
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.align-center {
-  align-items: center; // ✅ centre verticalement les colonnes
+.input-group {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
 }
 
-
-
-.titleModal{
-  color: black;
-  
+.input-icon {
+  padding-top: 1rem;
+  font-size: 1.5rem;
 }
 
-.timeline-grid {
-  padding: 0%;
+.input-wrapper {
+  flex: 1;
+  position: relative;
 }
 
-.timeline-line {
+.custom-input {
+  --background: var(--ion-color-light);
+  --padding-start: 1rem;
+  --padding-end: 1rem;
+  --padding-top: 0.75rem;
+  --padding-bottom: 0.75rem;
+  border-radius: var(--border-radius-md);
+  font-size: 1rem;
+}
+
+.autocomplete-dropdown {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  right: 0;
+  background: var(--ion-card-background);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-lg);
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.autocomplete-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 0%;
+  gap: 0.75rem;
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-bottom: 1px solid var(--ion-border-color);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover,
+  &:focus {
+    background-color: var(--ion-color-light);
+    outline: none;
+  }
 }
 
-.timeline-dot {
-  padding: 0%;
-  width: 10px;
-  height: 10px;
-  background-color: #000;
-  border-radius: 50%;
+.station-icon {
+  font-size: 1.25rem;
+  color: var(--ion-color-medium);
 }
 
-.timeline-segment {
-  flex-grow: 1;
-  height: 2px;
-  background-color: #999;
-  margin: 0 5px;
-}
-
-.timeline-icon {
+.swap-button-container {
   display: flex;
   justify-content: center;
+  margin: -0.5rem 0;
+}
+
+.swap-button {
+  --background: var(--ion-color-light);
+  --border-radius: 50%;
+  width: 40px;
+  height: 40px;
+
+  ion-icon {
+    font-size: 1.5rem;
+  }
+}
+
+.datetime-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.datetime-selector {
+  background: var(--ion-color-light);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+  &:hover {
+    background-color: var(--ion-color-tertiary);
+  }
+}
+
+.datetime-content {
+  display: flex;
   align-items: center;
-}
-.people-icon-group {
-  display: flex;
-  gap: 8px;
-  align-items: left;
+  gap: 0.75rem;
+
+  ion-icon:first-child {
+    font-size: 1.5rem;
+  }
 }
 
-.people-icon-group div {
+.datetime-text {
+  flex: 1;
   display: flex;
-  align-items: left;
-  gap: 4px;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
+.datetime-date {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--ion-text-color);
+}
+
+.datetime-time {
+  font-size: 0.875rem;
+  color: var(--ion-color-medium);
+}
+
+.mode-segment {
+  --background: var(--ion-color-light);
+  border-radius: var(--border-radius-sm);
+}
+
+.search-button {
+  --border-radius: var(--border-radius-md);
+  --padding-top: 1rem;
+  --padding-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+.quick-links {
+  h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--ion-text-color);
+  }
+}
+
+.quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+
+  ion-button {
+    --border-width: 2px;
+    --border-radius: var(--border-radius-md);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: 1.75rem;
+  }
+
+  .hero-section {
+    padding: 1.5rem 0.5rem;
+  }
+}
