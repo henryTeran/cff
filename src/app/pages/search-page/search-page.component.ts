@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { IonButton, IonButtons, IonCard, IonCardContent, IonChip, IonCol, IonContent, IonDatetime, IonDatetimeButton, IonFooter, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonList, IonModal, IonRow, IonSegmentButton, IonTitle, IonToolbar } from '@ionic/angular/standalone';
@@ -40,7 +40,7 @@ const UIElement = [
   selector: 'app-search-page',
   templateUrl: './search-page.component.html',
   styleUrls: ['./search-page.component.scss'],
-  imports: [CommonModule, ...UIElement, FormsModule, DividePipe]
+  imports: [CommonModule, ...UIElement, FormsModule, DividePipe, RouterLink]
 })
 export class SearchPageComponent implements OnInit, OnDestroy {
   public completionResponseFrom: CompletionResponse = [];
