@@ -6,6 +6,7 @@ import { RouteResponse, Connection } from '../../interfaces/routeResponse';
 import { DisruptionsService, DisruptionAlert } from '../../services/disruptions/disruptions.service';
 import { NotificationsService } from '../../services/notifications/notifications.service';
 import { SbbModeIconComponent } from '../../components/sbb-mode-icon/sbb-mode-icon.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { Subscription } from 'rxjs';
 
 const UI_ELEMENTS = [
@@ -29,7 +30,7 @@ const UI_ELEMENTS = [
 @Component({
   selector: 'app-result-page',
   standalone: true,
-  imports: [CommonModule, ...UI_ELEMENTS, SbbModeIconComponent],
+  imports: [CommonModule, ...UI_ELEMENTS, SbbModeIconComponent, TranslatePipe],
   templateUrl: './result-page.component.html',
   styleUrls: ['./result-page.component.scss']
 })

@@ -4,6 +4,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardContent, IonButton, IonIcon, IonGrid, IonRow, IonCol, IonLabel, IonButtons, IonList, IonItem } from '@ionic/angular/standalone';
 import { Connection } from '../../interfaces/routeResponse';
 import { SbbModeIconComponent } from '../../components/sbb-mode-icon/sbb-mode-icon.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
+import { I18nService } from '../../services/i18n/i18n.service';
 import { formatTime, formatDurationFromDates } from '../../utils/date-time.util';
 import { getLegCode } from '../../utils/icon.util';
 
@@ -16,7 +18,7 @@ const UI_ELEMENTS = [
 @Component({
   selector: 'app-connection-details',
   standalone: true,
-  imports: [CommonModule, ...UI_ELEMENTS, SbbModeIconComponent],
+  imports: [CommonModule, ...UI_ELEMENTS, SbbModeIconComponent, TranslatePipe],
   templateUrl: './connection-details.component.html',
   styleUrls: ['./connection-details.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,7 +29,8 @@ export class ConnectionDetailsComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private i18nService: I18nService
   ) {
     const navigation = this.router.getCurrentNavigation();
     if (navigation?.extras.state?.['connection']) {
@@ -65,11 +68,7 @@ export class ConnectionDetailsComponent implements OnInit {
   }
 
   getOccupancyLabel(occupancy: string): string {
-    const labels: Record<string, string> = {
-      'low': 'Faible',
-      'medium': 'Moyenne',
-      'high': 'Élevée'
-    };
-    return labels[occupancy] || occupancy;
+    const key = `occupancy.${occupancy.toLowerCase()}`;
+    return this.i18nService.t(key, occupancy);
   }
 }

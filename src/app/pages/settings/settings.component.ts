@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardContent, IonButton, IonIcon, IonButtons, IonList, IonItem, IonLabel, IonToggle, IonRange, IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { SettingsService, AlertPrefs, UiPrefs } from '../../services/storage/settings.service';
+import { I18nService, SupportedLanguage } from '../../services/i18n/i18n.service';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 const UI_ELEMENTS = [
   IonHeader, IonToolbar, IonTitle, IonContent, IonCard, IonCardContent,
@@ -14,7 +16,7 @@ const UI_ELEMENTS = [
 @Component({
   selector: 'app-settings',
   standalone: true,
-  imports: [CommonModule, FormsModule, ...UI_ELEMENTS],
+  imports: [CommonModule, FormsModule, TranslatePipe, ...UI_ELEMENTS],
   templateUrl: './settings.component.html',
   styleUrls: ['./settings.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -22,14 +24,19 @@ const UI_ELEMENTS = [
 export class SettingsComponent implements OnInit {
   alertPrefs!: AlertPrefs;
   uiPrefs!: UiPrefs;
+  currentLanguage: SupportedLanguage = 'fr';
+  supportedLanguages: SupportedLanguage[] = [];
 
   constructor(
     private router: Router,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private i18nService: I18nService
   ) {}
 
   ngOnInit() {
     this.loadSettings();
+    this.currentLanguage = this.i18nService.getCurrentLang();
+    this.supportedLanguages = this.i18nService.getSupportedLanguages();
   }
 
   private loadSettings() {
@@ -63,6 +70,10 @@ export class SettingsComponent implements OnInit {
   resetSettings() {
     this.settingsService.resetToDefaults();
     this.loadSettings();
+  }
+
+  async onLanguageChange() {
+    await this.i18nService.setLanguage(this.currentLanguage);
   }
 
   goBack() {

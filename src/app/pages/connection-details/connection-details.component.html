@@ -1,11 +1,11 @@
 <ion-header>
   <ion-toolbar color="danger">
     <ion-buttons slot="start">
-      <ion-button (click)="goBack()" aria-label="Retour">
+      <ion-button (click)="goBack()" [attr.aria-label]="'results.back' | t">
         <ion-icon name="chevron-back-outline" slot="start"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Détails de la connexion</ion-title>
+    <ion-title>{{ 'details.title' | t }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -16,19 +16,19 @@
         <ion-grid>
           <ion-row>
             <ion-col size="6">
-              <strong>Départ</strong>
+              <strong>{{ 'details.departure' | t }}</strong>
               <div>{{ connection.from }}</div>
               <div>{{ getTime(connection.departure) }}</div>
             </ion-col>
             <ion-col size="6">
-              <strong>Arrivée</strong>
+              <strong>{{ 'details.arrival' | t }}</strong>
               <div>{{ connection.to }}</div>
               <div>{{ getTime(connection.arrival) }}</div>
             </ion-col>
           </ion-row>
           <ion-row>
             <ion-col>
-              <strong>Durée totale:</strong> {{ getDuration(connection.departure, connection.arrival) }}
+              <strong>{{ 'details.totalDuration' | t }}:</strong> {{ getDuration(connection.departure, connection.arrival) }}
             </ion-col>
           </ion-row>
         </ion-grid>
@@ -37,7 +37,7 @@
 
     <ion-card>
       <ion-card-content>
-        <h3>Itinéraire détaillé</h3>
+        <h3>{{ 'details.detailedRoute' | t }}</h3>
         <ion-list>
           @for (leg of connection.legs; track leg; let i = $index) {
             <ion-item>
@@ -53,16 +53,16 @@
                       <div>{{ leg.name }} → {{ leg.exit?.name }}</div>
                       <div>{{ getTime(leg.departure || '') }} - {{ getTime(leg.exit?.arrival || '') }}</div>
                       @if (leg.track) {
-                        <div>Voie {{ leg.track }}</div>
+                        <div>{{ 'details.track' | t }} {{ leg.track }}</div>
                       }
                       @if (leg.occupancy) {
-                        <div>Occupation: {{ getOccupancyLabel(leg.occupancy) }}</div>
+                        <div>{{ 'details.occupancy' | t }}: {{ getOccupancyLabel(leg.occupancy) }}</div>
                       }
                     } @else {
-                      <div>Trajet à pied</div>
+                      <div>{{ 'details.walking' | t }}</div>
                       <div>{{ leg.name }} → {{ leg.exit?.name }}</div>
                       @if (leg.runningtime) {
-                        <div>{{ leg.runningtime }} minutes</div>
+                        <div>{{ leg.runningtime }} {{ 'details.minutes' | t }}</div>
                       }
                     }
                   </ion-col>
@@ -76,8 +76,8 @@
   } @else {
     <ion-card>
       <ion-card-content>
-        <p>Aucun détail disponible</p>
-        <ion-button (click)="goBack()">Retour aux résultats</ion-button>
+        <p>{{ 'details.noDetails' | t }}</p>
+        <ion-button (click)="goBack()">{{ 'details.backToResults' | t }}</ion-button>
       </ion-card-content>
     </ion-card>
   }

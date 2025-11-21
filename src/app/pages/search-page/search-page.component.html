@@ -1,11 +1,11 @@
 <ion-header>
   <ion-toolbar color="danger">
     <ion-title class="ion-text-center">
-      <img src="/logocff.svg" alt="CFF Logo" style="height: 32px; vertical-align: middle;">
+      <img src="/logocff.svg" [attr.alt]="'app.logo' | t" style="height: 32px; vertical-align: middle;">
       <span style="margin-left: 12px; font-weight: 600;">CFF</span>
     </ion-title>
     <ion-buttons slot="end">
-      <ion-button (click)="navigateToSettings()" aria-label="Paramètres">
+      <ion-button (click)="navigateToSettings()" [attr.aria-label]="'accessibility.settings' | t">
         <ion-icon name="settings-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -15,8 +15,8 @@
 <ion-content class="ion-padding">
   <div class="page-container">
     <div class="hero-section fade-in">
-      <h1 class="hero-title">Rechercher un trajet</h1>
-      <p class="hero-subtitle">Trouvez votre itinéraire CFF en quelques secondes</p>
+      <h1 class="hero-title">{{ 'search.title' | t }}</h1>
+      <p class="hero-subtitle">{{ 'search.subtitle' | t }}</p>
     </div>
 
     <ion-card class="search-card card-elevated">
@@ -29,10 +29,10 @@
             <div class="input-wrapper">
               <ion-input
                 [(ngModel)]="from"
-                placeholder="Gare de départ"
+                [placeholder]="'search.fromPlaceholder' | t"
                 (ionInput)="onInput(true)"
                 (keydown.enter)="routeSearch()"
-                aria-label="Gare de départ"
+                [attr.aria-label]="'search.from' | t"
                 class="custom-input"
               ></ion-input>
               @if (completionResponseFrom.length > 0) {
@@ -59,7 +59,7 @@
               fill="clear"
               size="small"
               (click)="swapStations()"
-              aria-label="Inverser les gares"
+              [attr.aria-label]="'search.swap' | t"
               class="swap-button"
             >
               <ion-icon name="swap-vertical" slot="icon-only"></ion-icon>
@@ -73,10 +73,10 @@
             <div class="input-wrapper">
               <ion-input
                 [(ngModel)]="to"
-                placeholder="Gare d'arrivée"
+                [placeholder]="'search.toPlaceholder' | t"
                 (ionInput)="onInput(false)"
                 (keydown.enter)="routeSearch()"
-                aria-label="Gare d'arrivée"
+                [attr.aria-label]="'search.to' | t"
                 class="custom-input"
               ></ion-input>
               @if (completionResponseTo.length > 0) {
@@ -112,10 +112,10 @@
 
             <ion-segment [(ngModel)]="mode" value="depart" class="mode-segment">
               <ion-segment-button value="depart">
-                <ion-label>Départ</ion-label>
+                <ion-label>{{ 'search.departure' | t }}</ion-label>
               </ion-segment-button>
               <ion-segment-button value="arrival">
-                <ion-label>Arrivée</ion-label>
+                <ion-label>{{ 'search.arrival' | t }}</ion-label>
               </ion-segment-button>
             </ion-segment>
           </div>
@@ -128,7 +128,7 @@
             class="search-button"
           >
             <ion-icon name="search-outline" slot="start"></ion-icon>
-            Rechercher
+            {{ 'search.button' | t }}
           </ion-button>
         </div>
       </ion-card-content>
@@ -144,7 +144,7 @@
         <ng-template>
           <ion-header>
             <ion-toolbar>
-              <ion-title>Date du voyage</ion-title>
+              <ion-title>{{ 'search.date' | t }}</ion-title>
               <ion-buttons slot="end">
                 <ion-button (click)="toggleModal()">
                   <ion-icon name="close" slot="icon-only"></ion-icon>
@@ -169,7 +169,7 @@
               (click)="validerDate()"
               class="ion-margin-top"
             >
-              Valider
+              {{ 'search.validate' | t }}
             </ion-button>
           </ion-content>
         </ng-template>
@@ -177,15 +177,15 @@
     }
 
     <div class="quick-links ion-margin-top">
-      <h3>Accès rapide</h3>
+      <h3>{{ 'search.quickAccess' | t }}</h3>
       <div class="quick-links-grid">
         <ion-button fill="outline" size="small" [routerLink]="['/settings']">
           <ion-icon name="settings-outline" slot="start"></ion-icon>
-          Paramètres
+          {{ 'settings.title' | t }}
         </ion-button>
         <ion-button fill="outline" size="small" (click)="navigateToOnboard()" [disabled]="!routeConnections">
           <ion-icon name="train-outline" slot="start"></ion-icon>
-          À bord
+          {{ 'onboard.title' | t }}
         </ion-button>
       </div>
     </div>

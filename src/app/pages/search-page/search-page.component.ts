@@ -9,6 +9,7 @@ import { ApiService } from '../../services/api/api.service';
 import { CompletionResponse } from '../../interfaces/completionResponse';
 import { Connection, Leg, RouteResponse } from '../../interfaces/routeResponse';
 import { DividePipe } from '../../pipes/divide.pipe';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 const UIElement = [
   IonContent,
@@ -41,7 +42,7 @@ const UIElement = [
   selector: 'app-search-page',
   templateUrl: './search-page.component.html',
   styleUrls: ['./search-page.component.scss'],
-  imports: [CommonModule, ...UIElement, FormsModule, DividePipe, RouterLink]
+  imports: [CommonModule, ...UIElement, FormsModule, DividePipe, TranslatePipe, RouterLink]
 })
 export class SearchPageComponent implements OnInit, OnDestroy {
   public completionResponseFrom: CompletionResponse = [];
